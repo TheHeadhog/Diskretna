@@ -15,6 +15,14 @@ public:
 		return id;
 	}
 	friend std::ostream& operator<<(std::ostream& os, Node& myNode);
+	void SetVisit(bool visit)
+	{
+		visited = visit;
+	}
+	bool GetVisit() const
+	{
+		return visited;
+	}
 
 private:
 	static int ID;
@@ -85,7 +93,7 @@ public:
 };
 
 std::pair<int,int*> Permutacije(Graph&, int);
-std::pair<int, int*> Permutacije(Graph& myGraph, int myNode, int& border,int it);
+std::pair<int, int*> Permutacije(Graph& myGraph, int myNode, int& border,int& it);
 
 bool Povezi(Graph& myGraph, int ind1, int ind2);
 bool DodajGranu(Graph& myGraph);
@@ -96,5 +104,6 @@ lstNode* GetNode(Graph& myGraph, Node* pom);
 int CalcDist(int*, Graph&);
 int CalcDist(int* IDs, Graph& myGraph, int border);
 void Kopiraj(int*, int*,int);
+std::pair<int, int*> Heuristika(Graph&, int);
 
 #endif GRAF_H

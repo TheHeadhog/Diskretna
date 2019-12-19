@@ -13,7 +13,8 @@ int main()
 	{
 		std::cout << "\nIzaberi metodu resavanja:"
 			"\n1. D-ALGORITAM"
-			"\n2. Heuristicka metoda"
+			"\n2. Optimizovani D-ALGORITAM"
+			"\n3. Heuristicka metoda najblizeg grada"
 			"\n0. Kraj rada"
 			"\n\n Vas izbor? ";
 		int izbor; std::cin >> izbor;
@@ -45,9 +46,9 @@ int main()
 			std::cin >> border;
 			std::cout << "\nUnesite broj iteracija (ukoliko ne zelite iteracije upisite 1):";
 			std::cin >> it;
-			for (int i = 0; i < OurGraph.size; i++) {
+			for (int i = 0; i < OurGraph.size&&it; i++) {
 				std::pair <int, int*> temp = Permutacije(OurGraph, i, border, it);
-				if ((temp.first < mojPar.first&&temp.first!=-1) || mojPar.first == -1)
+				if ((temp.first < mojPar.first && temp.first!=-1) || mojPar.first == -1)
 				{
 					mojPar = temp;
 				}
@@ -61,6 +62,22 @@ int main()
 				else
 					std::cout << mojPar.second[i] << std::endl;
 
+			}
+			break;
+		case 3:
+			for (int i = 0; i < OurGraph.size; i++) {
+				std::pair <int, int*> temp = Heuristika(OurGraph, i);
+				if ((temp.first < mojPar.first && temp.first != -1) || mojPar.first == -1)
+				{
+					mojPar = temp;
+				}
+			}
+			std::cout << "\n\nDuzina puta: " << mojPar.first << "\nZa redosled:\t";
+			for (int i = 0; i < OurGraph.size; i++) {
+				if (i != OurGraph.size - 1)
+					std::cout << mojPar.second[i] << " -> ";
+				else
+					std::cout << mojPar.second[i] << std::endl;
 			}
 			break;
 		default:

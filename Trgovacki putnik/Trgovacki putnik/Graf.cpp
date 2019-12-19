@@ -99,43 +99,6 @@ void BrisiGraf(Graph& myGraph)
 	myGraph.size = 0;
 }
 
-void Init(Graph& myGraph)
-{
-	BrisiGraf(myGraph);
-	int n;
-	std::cout << "Unesite broj cvorova grafa:\n";
-	std::cin >> n;
-	if (!(n > 0))
-	{
-		std::cin.clear();
-		std::cin.ignore();
-		n = 1;
-	}
-	myGraph.size = n;
-	myGraph.niz = (List**)realloc(myGraph.niz, n * (sizeof(List*)));
-	int NumPair = (n * (n - 1)) / 2;
-	for (int i = 0; i < n; i++)
-	{
-		myGraph.niz[i] = new List();
-		lstNode* tmp = new lstNode();
-		tmp->myNode = new Node();
-		myGraph.niz[i]->Dodaj(tmp);
-	}
-	myGraph.pairs = new Pair * [NumPair];
-	int ind = 0;
-	for (int i = 0; i < n - 1; i++)
-	{
-		for (int j = i + 1; j < n; j++)
-		{
-			if (Povezi(myGraph, i, j))
-			{
-				myGraph.pairs[ind] = new Pair(myGraph[i], myGraph[j], rand()%100 + 1);
-
-				std::cout << *myGraph.pairs[ind++];
-			}
-		}
-	}
-}
 
 lstNode* GetNode(Graph& myGraph, Node* pom)
 {
@@ -243,6 +206,44 @@ void Kopiraj(int* a, int* b, int n)
 }
 
 
+
+void Init(Graph& myGraph)
+{
+	BrisiGraf(myGraph);
+	int n;
+	std::cout << "Unesite broj cvorova grafa:\n";
+	std::cin >> n;
+	if (!(n > 0))
+	{
+		std::cin.clear();
+		std::cin.ignore();
+		n = 1;
+	}
+	myGraph.size = n;
+	myGraph.niz = (List**)realloc(myGraph.niz, n * (sizeof(List*)));
+	int NumPair = (n * (n - 1)) / 2;
+	for (int i = 0; i < n; i++)
+	{
+		myGraph.niz[i] = new List();
+		lstNode* tmp = new lstNode();
+		tmp->myNode = new Node();
+		myGraph.niz[i]->Dodaj(tmp);
+	}
+	myGraph.pairs = new Pair *[NumPair];
+	int ind = 0;
+	for (int i = 0; i < n - 1; i++)
+	{
+		for (int j = i + 1; j < n; j++)
+		{
+			if (Povezi(myGraph, i, j))
+			{
+				myGraph.pairs[ind] = new Pair(myGraph[i], myGraph[j], rand() % 100 + 1);
+				std::cout << *myGraph.pairs[ind++];
+			}
+		}
+	}
+}
+
 std::pair<int,int*> Permutacije(Graph& myGraph, int myNode)
 {
 	int perm = 1;
@@ -283,7 +284,7 @@ std::pair<int,int*> Permutacije(Graph& myGraph, int myNode)
 	return a;
 }
 
-std::pair<int, int*> Permutacije(Graph& myGraph, int myNode,int& border,int it)
+std::pair<int, int*> Permutacije(Graph& myGraph, int myNode,int& border,int& it)
 {
 	int perm = 1;
 	int* IDs = new int[myGraph.size];
@@ -322,13 +323,70 @@ std::pair<int, int*> Permutacije(Graph& myGraph, int myNode,int& border,int it)
 			}
 			if (min != -1 && min < border) {
 				border = min; it--; 
-				std::cout << "\nNadjena prva iteracija:\n";
+				std::cout << "\nNadjena iteracija:\n";
 				system("Pause");
 			}
 		}
 	} while (std::next_permutation(IDs + 1, IDs + myGraph.size)&&it);
 
 	std::pair <int, int* > a(min, validPut);
+	return a;
+}
 
+std::pair<int, int*> Heuristika(Graph& myGraph, int myNode)
+{
+	int size = myGraph.size;
+	List* Poc = myGraph.niz[myNode];
+	lstNode *pom = Poc->GetHead();
+	int min = -1;
+	int * validPut = new int[size];
+	int curr = 0;
+	int duz = 0;
+	int tempID, next;
+	int NumPairs = (size * (size - 1)) / 2;
+
+	for (int i = 0; i < size; i++)
+		myGraph[i]->SetVisit(false);
+
+
+	myGraph[myNode]->SetVisit(true);
+	validPut[curr++] = myNode;
+
+
+	while (curr < size)
+	{
+		min = -1;
+		tempID = validPut[curr - 1];
+		for (int i = 0; i < NumPairs; i++)
+		{
+			if (myGraph.pairs[i]->nod1_->GetID() == tempID)
+			{
+				if (myGraph.pairs[i]->nod2_->GetVisit() == false)
+					if (min == -1 || myGraph.pairs[i]->dist_ < min)
+					{
+						min = myGraph.pairs[i]->dist_;
+						next = myGraph.pairs[i]->nod2_->GetID();
+
+					}
+			}
+			else if (myGraph.pairs[i]->nod2_->GetID() == tempID)
+			{
+				if (myGraph.pairs[i]->nod1_->GetVisit() == false)
+					if (min == -1 || myGraph.pairs[i]->dist_ < min)
+					{
+						min = myGraph.pairs[i]->dist_;
+						next = myGraph.pairs[i]->nod1_->GetID();
+					}
+			}
+		}
+		myGraph[next]->SetVisit(true);
+		validPut[curr++] = next;
+		duz += min;
+	}
+
+	for (int j=0; j < size; j++)
+		std::cout << validPut[j] << " ";
+	std::cout << " " << duz << std::endl;
+	std::pair <int, int* > a(duz, validPut);
 	return a;
 }
